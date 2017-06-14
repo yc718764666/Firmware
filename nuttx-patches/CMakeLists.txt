@@ -51,7 +51,6 @@ set(nuttx_patches
 	00017-BACKPORT-cdcacm.patch
 	00018-BACKPORT-stm32-serial-break.patch
 	00019-BACKPORT-stm32-rcc-keep-HSI-on.patch
-	00020-BACKPORT-ramtron-CONFIG-prefix.patch
 	00021-BACKPORT-stm32f3x-add-BKP.patch
 	00022-BACKPORT-stm32-bkp-reference-fix.patch
 	00023-BACKPORT-stm32f7-bkp-reference-fix.patch
@@ -59,6 +58,7 @@ set(nuttx_patches
 	00025-BACKPORT-add-set-ex-to-nsh.patch
 	00026-BACKPORT-stm32fX-serial-fix-freezing.patch
 	00027-BACKPORT-stm32-sdio-1-bit-and-16G-fix.patch
+	00028-BACKPORT-mtd-FLASH-corruption.patch
 	90000-PENDING-wip-inflight-to-upstream.patch
 	)
 
