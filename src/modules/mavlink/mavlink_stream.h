@@ -100,7 +100,7 @@ protected:
 	unsigned int _interval;		///< if set to zero = unlimited rate
 
 #ifndef __PX4_QURT
-	virtual void send(const hrt_abstime t) = 0;
+	virtual bool send(const hrt_abstime t) = 0;
 #endif
 
 private:

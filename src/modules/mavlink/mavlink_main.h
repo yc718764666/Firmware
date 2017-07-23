@@ -41,6 +41,8 @@
 
 #pragma once
 
+#include <px4_posix.h>
+
 #include <stdbool.h>
 #ifdef __PX4_NUTTX
 #include <nuttx/fs/fs.h>
@@ -309,7 +311,7 @@ public:
 
 	mavlink_channel_t	get_channel();
 
-	void			configure_stream_threadsafe(const char *stream_name, float rate);
+	void			configure_stream_threadsafe(const char *stream_name, float rate = -1.0f);
 
 	bool			_task_should_exit;	/**< if true, mavlink task should exit */
 
@@ -431,7 +433,7 @@ public:
 
 	bool			verbose() { return _verbose; }
 
-	int				get_data_rate() { return _datarate; }
+	int			get_data_rate()		{ return _datarate; }
 	void			set_data_rate(int rate) { if (rate > 0) { _datarate = rate; } }
 
 	uint64_t		get_main_loop_delay() { return _main_loop_delay; }
@@ -455,6 +457,9 @@ public:
 		if (_mavlink_ulog) { _mavlink_ulog_stop_requested = true; }
 	}
 
+
+	void set_uorb_main_fd(int fd, unsigned int interval);
+
 protected:
 	Mavlink			*next;
 
@@ -464,7 +469,9 @@ private:
 	orb_advert_t		_mavlink_log_pub;
 	bool			_task_running;
 	static bool		_boot_complete;
-	static const unsigned MAVLINK_MAX_INSTANCES = 4;
+	static constexpr unsigned MAVLINK_MAX_INSTANCES = 4;
+	static constexpr unsigned MAVLINK_MIN_INTERVAL = 1500;
+	static constexpr unsigned MAVLINK_MAX_INTERVAL = 10000;
 	mavlink_message_t _mavlink_buffer;
 	mavlink_status_t _mavlink_status;
 
@@ -590,13 +597,13 @@ private:
 	int			mavlink_open_uart(int baudrate, const char *uart_name);
 #endif
 
-	static unsigned int	interval_from_rate(float rate);
+	static int		interval_from_rate(float rate);
 
 	static constexpr unsigned RADIO_BUFFER_CRITICAL_LOW_PERCENTAGE = 25;
 	static constexpr unsigned RADIO_BUFFER_LOW_PERCENTAGE = 35;
 	static constexpr unsigned RADIO_BUFFER_HALF_PERCENTAGE = 50;
 
-	int configure_stream(const char *stream_name, const float rate);
+	int configure_stream(const char *stream_name, const float rate = -1.0f);
 
 	/**
 	 * Adjust the stream rates based on the current rate
@@ -618,6 +625,14 @@ private:
 	void message_buffer_mark_read(int n);
 
 	void pass_message(const mavlink_message_t *msg);
+
+	/**
+	 * Check the configuration of a connected radio
+	 *
+	 * This convenience function allows to re-configure a connected
+	 * radio without removing it from the main system harness.
+	 */
+	void check_radio_config();
 
 	/**
 	 * Update rate mult so total bitrate will be equal to _datarate.
